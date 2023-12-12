@@ -6,7 +6,7 @@ export function reverse_parts_of_speech_mapping(parts_of_speech: string | string
     const matched_pos_obj = partsOfSpeech.find(pos => pos.enName === part_of_speech)?.enAbbrev;
     return matched_pos_obj || part_of_speech;
   });
-  return parts_of_speech_abbreviations;
+  return [...new Set(parts_of_speech_abbreviations)];
 }
 
 
@@ -26,6 +26,12 @@ if (import.meta.vitest) {
 
     test('converts string to array and abbreviate', () => {
       const pos = 'noun';
+      const expected = ['n'];
+      expect(reverse_parts_of_speech_mapping(pos)).toEqual(expected);
+    });
+
+    test('eliminates duplicates if exists', () => {
+      const pos = ['noun', 'n'];
       const expected = ['n'];
       expect(reverse_parts_of_speech_mapping(pos)).toEqual(expected);
     })
