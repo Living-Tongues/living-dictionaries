@@ -2,6 +2,7 @@ import { ActualDatabaseEntry } from '@living-dictionaries/types';
 import { db } from '../config';
 import { program } from 'commander';
 import { reverse_semantic_domains_mapping } from './reverse-semantic-domains-mapping';
+import { reverse_parts_of_speech_mapping } from './reverse-parts-of-speech-mapping';
 import { turn_dialect_strings_to_arrays } from './turn-dialects-to-arrays';
 program
   //   .version('0.0.1')
@@ -43,7 +44,8 @@ async function fetchEntries(dictionaryId: string) {
     // await notesToPluralForm(dictionaryId, entry);
     // turnPOSintoArray(dictionaryId, entry); // not awaiting so operations can run in parallel otherwise the function errors after about 1400 iterations
     // reverese_semantic_domains_in_db(dictionaryId, entry);
-    turnDialectsIntoArray(dictionaryId, entry);
+    // turnDialectsIntoArray(dictionaryId, entry);
+    reverese_parts_of_speech_in_db(dictionaryId, entry);
   }
 }
 
@@ -71,6 +73,19 @@ const reverese_semantic_domains_in_db = async (dictionaryId: string, entry: Actu
   }
   console.log('entry sdn after:');
   console.log(entry.sdn);
+  if (!live) return;
+  await db.collection(`dictionaries/${dictionaryId}/words`).doc(entry.id).set(entry);
+  return true;
+};
+
+const reverese_parts_of_speech_in_db = async (dictionaryId: string, entry: ActualDatabaseEntry) => {
+  if (entry.ps) {
+    console.log('entry ps before:');
+    console.log(entry.ps);
+    entry.ps = reverse_parts_of_speech_mapping(entry.ps);
+  }
+  console.log('entry ps after:');
+  console.log(entry.ps);
   if (!live) return;
   await db.collection(`dictionaries/${dictionaryId}/words`).doc(entry.id).set(entry);
   return true;
